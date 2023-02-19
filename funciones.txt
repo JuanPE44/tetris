@@ -1,0 +1,19 @@
+TABLERO {
+  colocarFicha()
+  EliminarFilasLLenas()
+  ComprobarFilasLLEnas()
+  FichaColisiona()
+  FichaColisionaAlRotar()
+}
+
+Bolsa {
+
+}
+
+Ficha {
+
+}
+
+puntuaciion{
+  
+}
