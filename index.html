@@ -4,24 +4,31 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="estilos.css">
+  <script
+    src="https://kit.fontawesome.com/56af8815be.js"
+    crossorigin="anonymous"
+  ></script>
   <title>Tetris</title>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
+  <div class="contenedor">
+    <div class="header">
+      <div class="score">SCORE 0</div>
+      <div class="highscore">HIGHSCORE 0</div>
+    </div>
+    <canvas id="canvas"></canvas>
+    <div class="footer">
+      <button class="pausa"><i class="fa-solid fa-play"></i></button>
+      <button class="move-izquierda"><i class="fa-solid fa-arrow-left"></i></button>
+      <button class="move-abajo"><i class="fa-solid fa-arrow-down"></i></button>
+      <button class="move-derecha"><i class="fa-solid fa-arrow-right"></i></button>
+      <button class="rotar"><i class="fa-solid fa-rotate-right"></i></button>
+      <button class="reiniciar">Reset</button>
+    </div>
+  </div>
   <script src="Ficha.js"></script>
   <script src="Tablero.js"></script>
   <script src="index.js"></script>
 </body>
-
-<style>
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #222;
-  }
-  canvas {
-    border: 1px solid #000;
-  }
-</style>
 </html>
