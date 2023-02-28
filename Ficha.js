@@ -7,14 +7,15 @@ class Ficha {
   crearFicha(n) {
     return this.ficha = [
       {
+        color : '#31d37a',
         rotaciones: 
         [
           // 0
           [
-            [0,n,0],
-            [0,n,0],
-            [0,n,0],
-            [0,n,0]
+            [0,n,0,0],
+            [0,n,0,0],
+            [0,n,0,0],
+            [0,n,0,0]
           ],
           // 1
           [
@@ -38,6 +39,7 @@ class Ficha {
         ]
       },
       {
+        color : '#9731d3',
         rotaciones: 
         [
           // 0
@@ -65,6 +67,7 @@ class Ficha {
         ]
       },
       {
+        color : '#31d339',
         rotaciones: 
         [
           [
@@ -78,9 +81,9 @@ class Ficha {
             [n,n,0]
           ], 
           [
-            [n,0,0],
-            [n,n,0],
-            [0,n,0]          
+            [0,n,0],
+            [0,n,n],
+            [0,0,n]          
           ],
           [
             [0,0,0],          
@@ -90,6 +93,7 @@ class Ficha {
         ]
       },
       {
+        color : '#ceb130',
         rotaciones: 
         [
           [
@@ -111,6 +115,7 @@ class Ficha {
         ]
       },
       {
+        color : '#31add3',
         rotaciones: 
         [
           [
@@ -134,7 +139,61 @@ class Ficha {
             [0,n,0]     
           ]
         ]
-      }      
+      },
+      {
+        color : '#d37231',
+        rotaciones: 
+        [
+          // 0
+          [ 
+            [0,n,0],
+            [0,n,0],
+            [n,n,0]
+          ],
+          // 1
+          [ 
+            [n,n,n],
+            [0,0,n]
+          ],
+          //  2
+          [ 
+            [0,n,n],
+            [0,n,0],
+            [0,n,0]
+          ],
+          // 3
+          [             
+            [n,0,0],
+            [n,n,n]           
+          ]
+        ]
+      }, 
+      {
+        color : '#d33131',
+        rotaciones: 
+        [
+          [
+            [0,n,0],
+            [n,n,0],
+            [n,0,0]          
+          ],
+          [
+            [n,n,0],                      
+            [0,n,n],
+            [0,0,0]
+          ], 
+          [
+            [0,n,0],
+            [n,n,0],
+            [n,0,0]          
+          ],
+          [
+            [n,n,0],          
+            [0,n,n],
+            [0,0,0]
+          ]
+        ]
+      }    
     ]
   }  
 }

@@ -1,3 +1,16 @@
+const cargarSonido = (fuente, autoplay) => {
+  const sonido = document.createElement("audio");
+  sonido.src = fuente;
+  sonido.setAttribute("preload", "auto");
+  sonido.setAttribute("controls", "none");
+  sonido.loop = autoplay;
+  sonido.style.display = "none"; // <-- oculto
+  document.body.appendChild(sonido);
+  return sonido;
+};
+// const musicaTetris = cargarSonido('sonidos/cancionTetris.mp3', true);
+// const moverAudio = cargarSonido('sonidos/mover.mp3');
+
 class Tablero {
   static FILAS = 20;
   static COLUMNAS = 10;
@@ -10,19 +23,20 @@ class Tablero {
     this.idFicha = 1;
     this.colorFichas = [];
     this.fichaActual = [];
-    this.indexFicha = 3;
+    this.indexFichaAnterior = null;
+    this.indexFicha = 0;
     this.indexRotacion = 0;
     this.posicionesFicha = [];
     this.pausa = true;
     this.perder = false;
     this.mover = false;
     this.puntaje = 0;
-    this.velocidad = 500;
+    this.velocidad = 800;
     this.loop;
   }
 
   crearTablero() {
-    document.addEventListener("keydown", (e) => this.control(e));
+    document.addEventListener("keydown", (e) => this.control(e.key, true));
 
     // colocamos el ancho y largo del canvas
     ctx.canvas.width = Tablero.COLUMNAS * Tablero.CUBO_LARGO;
@@ -58,7 +72,7 @@ class Tablero {
         // ctx.strokeStyle = `#${(((1 << 24) * (Math.random() + 1)) | 0)
         // .toString(16)
         // .substr(1)}`;
-        ctx.strokeStyle = numero !== 0 ? this.obtenerColor(numero) : "#fff";
+        ctx.strokeStyle = "#fff";
         ctx.strokeRect(
           y * Tablero.CUBO_LARGO,
           x * Tablero.CUBO_LARGO,
@@ -71,26 +85,28 @@ class Tablero {
 
   manejarPausa() {
     this.pausa ? (this.pausa = false) : (this.pausa = true);
-    this.pausa ? this.pausar() : this.jugar();
+    this.pausa ? this.pausarPartida() : this.reanudarPartida();
   }
 
-  jugar() {
+  reanudarPartida() {
     document.querySelector(".pausa").innerHTML =
       '<i class="fa-solid fa-pause"></i>';
     this.mover = true;
     this.iniciarLoop();
+    // musicaTetris.play()
   }
 
-  pausar() {
+  pausarPartida() {
     document.querySelector(".pausa").innerHTML =
       '<i class="fa-solid fa-play"></i>';
     this.mover = false;
     clearInterval(this.loop);
+    // musicaTetris.pause()
   }
 
   iniciarLoop() {
     this.loop = setInterval(() => {
-      this.bajarFicha();
+      this.control("ArrowDown", false);
     }, this.velocidad);
   }
 
@@ -101,33 +117,24 @@ class Tablero {
   crearFicha() {
     const f = new Ficha();
     const ficha = f.crearFicha(this.idFicha);
-    const color = `#${(((1 << 24) * (Math.random() + 1)) | 0)
-      .toString(16)
-      .substr(1)}`;
-    this.colorFichas.push({ id: this.idFicha++, color: color });
+    const numRandom = Math.floor(Math.random() * 6);
     this.globalX = 4;
     this.globalY = 0;
     this.indexRotacion = 0;
-    this.indexFicha >= 4 ? (this.indexFicha = 0) : this.indexFicha++;
+    this.indexFicha =
+      this.indexFichaAnterior !== numRandom
+        ? numRandom
+        : this.indexFichaAnterior + 1;
     this.fichaActual = ficha[this.indexFicha];
     this.posicionesFicha = [];
+    this.colorFichas.push({
+      id: this.idFicha++,
+      color: ficha[this.indexFicha].color,
+    });
+    this.indexFichaAnterior = this.indexFicha;
   }
 
-  bajarFicha() {
-    this.descolocarFicha();
-    this.globalY++;
-    this.colocarFicha();
-  }
-
-  perdio() {
-    this.crearFicha();
-    const { posiciones } = this.obtenerPosiciones();
-    this.pintarFicha(posiciones);
-    clearInterval(this.loop);
-    this.mover = false;    
-  }
-
-  actualizarPuntos() {
+  actualizarMejorPuntaje() {
     let puntos = JSON.parse(localStorage.getItem("puntos"));
     puntos.push(this.puntaje);
     localStorage.setItem("puntos", JSON.stringify(puntos));
@@ -144,56 +151,12 @@ class Tablero {
     document.querySelector(".highscore").innerHTML = `HIGHSCORE ${max}`;
   }
 
-  colocarFicha(direccion) {
-    // si direccion es true izquierda, sino es derecha
-    const { posiciones, adentroTablero } = this.obtenerPosiciones();
-    let moverAbajo = this.sePuedeMoverAbajo(posiciones);
-    let [moverIzquierda, moverDerecha] = this.sePuedeMoverCostados(
-      this.posicionesFicha
-    );
-    const perdio = this.comprobarSiPerdio(posiciones, moverAbajo);
-
-    // si existe direccion
-    if (direccion !== undefined) {
-      // si se mueve a la iquierda hay una ficha
-      if (!direccion && !moverIzquierda) {
-        this.globalX++;
-        const { posiciones } = this.obtenerPosiciones();
-        this.pintarFicha(posiciones);
-        return;
-      }
-      // si se mueve a la derecha y hay una ficha
-      if (direccion && !moverDerecha) {
-        this.globalX--;
-        const { posiciones } = this.obtenerPosiciones();
-        this.pintarFicha(posiciones);
-        return;
-      }
-    }
-
-    if (perdio) {
-      this.pintarFicha(posiciones);
-      this.perdio();
-    } else if (moverAbajo) {
-      if (adentroTablero) {
-        this.pintarFicha(posiciones);
-        this.posicionesFicha = posiciones;
-      } else {
-        this.pintarFicha(this.posicionesFicha);
-        this.globalX < 0 ? this.globalX++ : this.globalX--;
-      }
-    } else {
-      this.pintarFicha(posiciones);
-      this.crearFicha();
-      this.globalY--;
-      this.filaCompletada();
-    }
-  }
-
-  moverFicha(direccion) {
-    this.descolocarFicha();
-    direccion ? this.globalX++ : this.globalX--;
-    this.colocarFicha(direccion);
+  colocarFicha() {
+    const posiciones = this.obtenerPosiciones();
+    this.comprobarSiPerdio(posiciones);
+    this.pintarFicha(posiciones);
+    this.posicionesFicha = posiciones;
+    // moverAudio.play()
   }
 
   sePuedeMoverAbajo(posiciones) {
@@ -201,7 +164,8 @@ class Tablero {
     posiciones.forEach((caja) => {
       if (
         caja.y >= Tablero.FILAS - 1 ||
-        this.tablero[caja.y + 1][caja.x] !== 0
+        (this.tablero[caja.y + 1][caja.x] !== 0 &&
+          this.tablero[caja.y + 1][caja.x] !== caja.num)
       ) {
         mover = false;
       }
@@ -212,12 +176,21 @@ class Tablero {
   sePuedeMoverCostados(posiciones) {
     let moverIzquierda = true;
     let moverDerecha = true;
+
     posiciones.forEach((caja) => {
-      if (caja.x + 1 < Tablero.COLUMNAS && caja.x - 1 >= 0) {
-        if (this.tablero[caja.y][caja.x - 1] !== 0) {
+      if (caja.x - 1 < 0) {
+        moverIzquierda = false;
+      } else if (caja.x + 1 >= Tablero.COLUMNAS) {
+        moverDerecha = false;
+      } else {
+        // si esta adentro del tablero
+        let anterior = this.tablero[caja.y][caja.x - 1];
+        let siguiente = this.tablero[caja.y][caja.x + 1];
+
+        if (anterior !== 0 && anterior !== caja.num) {
           moverIzquierda = false;
         }
-        if (this.tablero[caja.y][caja.x + 1] !== 0) {
+        if (siguiente !== 0 && siguiente !== caja.num) {
           moverDerecha = false;
         }
       }
@@ -236,19 +209,19 @@ class Tablero {
       if (contador === Tablero.COLUMNAS) {
         this.pintarFila(x);
         this.eliminarFila(x);
-        this.puntaje += 100;
-        document.querySelector(".score").innerHTML = `SCORE ${this.puntaje}`;
-        this.actualizarPuntos();
-        this.pintarMejorPuntaje();
-        if (this.velocidad > 80) {
-          this.velocidad -= 4;
-        }
-        clearInterval(this.loop);
-        this.iniciarLoop();
-        console.log(this.puntaje);
+        this.actualizarPuntaje(100);
+        this.aumentarVelocidad();
       }
       contador = 0;
     }
+  }
+
+  aumentarVelocidad() {
+    if (this.velocidad > 80) {
+      this.velocidad -= 4;
+    }
+    clearInterval(this.loop);
+    this.iniciarLoop();
   }
 
   eliminarFila(numFila) {
@@ -274,21 +247,28 @@ class Tablero {
     });
   }
 
-  comprobarSiPerdio(posiciones, moverAbajo) {
-    let perdio = false;
-    posiciones.forEach((caja) => {
-      if (caja.y <= 3 && !moverAbajo) {
-        perdio = true;
-        this.perder = true;
-      }
-    });
-    return perdio;
+  actualizarPuntaje(puntaje) {
+    this.puntaje += puntaje;
+    document.querySelector(".score").innerHTML = `SCORE ${this.puntaje}`;
+    this.actualizarMejorPuntaje();
+    this.pintarMejorPuntaje();
   }
 
-  rotarFicha() {
-    this.descolocarFicha();
-    this.indexRotacion >= 3 ? (this.indexRotacion = 0) : this.indexRotacion++;
-    this.colocarFicha(); //
+  comprobarSiPerdio(posiciones) {
+    let moverAbajo = this.sePuedeMoverAbajo(posiciones);
+    posiciones.forEach((caja) => {
+      if (caja.y <= 0 && !moverAbajo) {
+        this.perder = true;
+        this.perdio();
+      }
+    });
+  }
+
+  perdio() {
+    this.crearFicha();
+    clearInterval(this.loop);
+    this.mover = false;
+    this.pausarPartida();
   }
 
   descolocarFicha() {
@@ -310,14 +290,7 @@ class Tablero {
     let posiciones = [];
     fichaActual.forEach((array, indexY) => {
       array.forEach((num, indexX) => {
-        // si esta adentro del tablero
-        if (
-          indexX + this.globalX >= 0 &&
-          indexX + this.globalX < Tablero.COLUMNAS &&
-          indexY + this.globalY >= 0 &&
-          indexY + this.globalY < Tablero.FILAS &&
-          num !== 0
-        ) {
+        if (num !== 0) {
           posiciones.push({
             y: indexY + this.globalY,
             x: indexX + this.globalX,
@@ -326,27 +299,54 @@ class Tablero {
         }
       });
     });
-    return { posiciones: posiciones, adentroTablero: posiciones.length >= 4 };
+    return posiciones;
   }
 
-  control(e) {
+  control(key, precionarTecla) {
+    let [moverIzquierda, moverDerecha] = this.sePuedeMoverCostados(
+      this.posicionesFicha
+    );
+    let moverAbajo = this.sePuedeMoverAbajo(this.posicionesFicha);
+    const adentroTablero = this.posicionesFicha.length >= 3;
+
     if (this.mover) {
-      switch (e.keyCode) {
-        case 37:
-          this.moverFicha(false); // izquierda
+      switch (key) {
+        case "ArrowLeft":
+          if (moverIzquierda && adentroTablero) {
+            this.globalX--;
+          } // izquierda
           break;
-        case 39:
-          this.moverFicha(true); // derecha
+        case "ArrowRight":
+          if (moverDerecha && adentroTablero) {
+            this.globalX++;
+          } //derecha
           break;
-        case 40:
-          this.bajarFicha(); //abajo
+        case "ArrowDown": // abajo
+          if (moverAbajo) {
+            this.globalY++;
+            if (precionarTecla) {
+              this.actualizarPuntaje(1);
+            }
+          } else {
+            this.crearFicha();
+            this.filaCompletada();
+          }
           break;
-        case 82:
-          this.rotarFicha(); // R
+        case ",":
+          this.indexRotacion <= 0
+            ? (this.indexRotacion = 3)
+            : this.indexRotacion--; // ,
+          break;
+        case ".":
+          this.indexRotacion >= 3
+            ? (this.indexRotacion = 0)
+            : this.indexRotacion++; // .
           break;
       }
+      this.descolocarFicha();
+      this.colocarFicha();
     }
-    if (e.keyCode === 80) {
+    if (key === "p" && !this.perder) {
       this.manejarPausa();
     }
   }

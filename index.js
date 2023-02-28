@@ -10,12 +10,14 @@ if(localStorage.getItem('puntos') === null) {
 const t = new Tablero();
 
 document.querySelector('.pausa').addEventListener('click', ()=> t.manejarPausa())
-document.querySelector('.move-izquierda').addEventListener('click',()=> t.moverFicha(false))
-document.querySelector('.move-derecha').addEventListener('click',()=> t.moverFicha(true))
-document.querySelector('.move-abajo').addEventListener('click',()=> t.bajarFicha())
-document.querySelector('.rotar').addEventListener('click',()=> t.rotarFicha())
+document.querySelector('.move-izquierda').addEventListener('click',()=> t.control('ArrowLeft', false))
+document.querySelector('.move-derecha').addEventListener('click',()=> t.control('ArrowRight', false))
+document.querySelector('.move-abajo').addEventListener('click',()=> t.control('ArrowDown', true))
+document.querySelector('.rotar').addEventListener('click',()=> t.control('.', false))
 document.querySelector('.reiniciar').addEventListener('click',()=> location.reload())
 
 t.crearTablero()
+
+
 
 // <i class="fa-solid fa-pause"></i>
