@@ -10,7 +10,6 @@ const cargarSonido = (fuente, autoplay) => {
 };
 // const musicaTetris = cargarSonido('sonidos/cancionTetris.mp3', true);
 // const moverAudio = cargarSonido('sonidos/mover.mp3');
-
 class Tablero {
   static FILAS = 20;
   static COLUMNAS = 10;
