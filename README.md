@@ -1,2 +1,2 @@
 # tetris
-tetris desarrollado con javascript, sass y html :)
+tetris desarrollado con javascript, css y html :)
