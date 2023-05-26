@@ -15,6 +15,14 @@ Este es un proyecto del juego Tetris utilizando HTML, CSS y JavaScript. El juego
 - Funcionalidad de rotación de las piezas.
 - Muestra la puntuación actual.
 
+## Uso
+
+- Utiliza las teclas de flecha izquierda (`←`), derecha (`→`) y abajo (`↓`) para mover las piezas en el tablero.
+- Utiliza las teclas coma (`,`) o punto (`.`) para rotar las piezas a la izquierda o derecha.
+- El objetivo del juego es completar filas en el tablero para eliminarlas y ganar puntos.
+- El juego termina cuando las piezas se acumulan hasta la parte superior del tablero.
+
+
 ## Instalación
 
 1. Clona este repositorio en tu máquina local
