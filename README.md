@@ -9,7 +9,6 @@ Este es un proyecto del juego Tetris utilizando HTML, CSS y JavaScript. El juego
 
 ## Características
 
-- Interfaz gráfica sencilla y fácil de usar.
 - Muestra el tablero de juego y las piezas que caen.
 - Permite a los jugadores mover las piezas hacia la izquierda, derecha y abajo.
 - Funcionalidad de rotación de las piezas.
